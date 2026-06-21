@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Inter, JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -60,6 +61,7 @@ export default function RootLayout({
           className={`${bricolage.variable} ${inter.variable} ${jetbrains.variable} grain antialiased`}
         >
           {children}
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
