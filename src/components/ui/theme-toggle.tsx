@@ -10,6 +10,8 @@ export function ThemeToggle({ className }: { className?: string }) {
     const current = document.documentElement.classList.contains("light")
       ? "light"
       : "dark";
+    // Sync React state with the theme the no-flash script already applied.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(current);
   }, []);
 

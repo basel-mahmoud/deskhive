@@ -28,6 +28,8 @@ export function ReplyBox({
 
   useEffect(() => {
     if (state.ok) {
+      // Reset the composer and refresh the thread after a successful send.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBody("");
       formRef.current?.reset();
       router.refresh();

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   Sparkles,
   Timer,
@@ -308,9 +309,9 @@ export default function Home() {
             <a href="#pricing" className="hover:text-ink">
               Pricing
             </a>
-            <a href="/sign-in" className="hover:text-ink">
+            <Link href="/sign-in" className="hover:text-ink">
               Sign in
-            </a>
+            </Link>
           </div>
         </div>
       </footer>

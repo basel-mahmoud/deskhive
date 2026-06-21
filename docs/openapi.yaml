@@ -1,0 +1,111 @@
+openapi: 3.1.0
+info:
+  title: DeskHive Customer Portal API
+  version: "1.0.0"
+  description: >
+    Public, per-workspace API powering the customer portal. Rate limited per IP.
+    Ticket creation supports an Idempotency-Key for safe retries. Authenticated
+    agent operations are exposed as Next.js server actions, not REST, and are not
+    documented here.
+servers:
+  - url: https://{appHost}
+    variables:
+      appHost:
+        default: deskhive.vercel.app
+paths:
+  /api/portal/{slug}/tickets:
+    post:
+      summary: Submit a support request
+      description: Rate limited to 5 requests/minute/IP. Honeypot field `company` must be empty.
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+        - in: header
+          name: Idempotency-Key
+          required: false
+          schema: { type: string }
+          description: Opaque key; replays return the original response for 24h.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subject, body, requesterEmail]
+              properties:
+                subject: { type: string, minLength: 3, maxLength: 200 }
+                body: { type: string, minLength: 1, maxLength: 5000 }
+                requesterEmail: { type: string, format: email }
+                requesterName: { type: string, maxLength: 100 }
+                company: { type: string, description: Honeypot; leave empty }
+      responses:
+        "201":
+          description: Ticket created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: { number: { type: integer, example: 1042 } }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { description: Idempotency conflict / in progress }
+        "429": { $ref: "#/components/responses/RateLimited" }
+  /api/portal/{slug}/lookup:
+    post:
+      summary: Track a ticket by number + email
+      description: Rate limited to 10 requests/minute/IP. Requires the requester email to match (prevents enumeration).
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [number, email]
+              properties:
+                number: { type: integer }
+                email: { type: string, format: email }
+      responses:
+        "200":
+          description: Ticket status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ticket:
+                    type: object
+                    properties:
+                      number: { type: integer }
+                      subject: { type: string }
+                      status: { type: string, enum: [open, pending, resolved, closed] }
+                      priority: { type: string, enum: [low, normal, high, urgent] }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+components:
+  parameters:
+    Slug:
+      in: path
+      name: slug
+      required: true
+      schema: { type: string }
+      description: Workspace slug.
+  responses:
+    BadRequest:
+      description: Validation failed
+      content:
+        application/json:
+          schema: { type: object, properties: { error: { type: string } } }
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { type: object, properties: { error: { type: string } } }
+    RateLimited:
+      description: Too many requests
+      headers:
+        Retry-After: { schema: { type: integer }, description: Seconds until reset }
+      content:
+        application/json:
+          schema: { type: object, properties: { error: { type: string } } }

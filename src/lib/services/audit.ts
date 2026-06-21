@@ -33,6 +33,11 @@ function canonical(e: AuditEntry, prevHash: string | null): string {
   });
 }
 
+/** Pure hash of an entry given the previous hash. Exported for testing. */
+export function hashEntry(e: AuditEntry, prevHash: string | null): string {
+  return createHash("sha256").update(canonical(e, prevHash)).digest("hex");
+}
+
 export async function appendAudit(tx: Tx, entry: AuditEntry): Promise<string> {
   // Serialise appends for this workspace within the transaction.
   await tx.execute(
@@ -47,9 +52,7 @@ export async function appendAudit(tx: Tx, entry: AuditEntry): Promise<string> {
     .limit(1);
   const prevHash = prev[0]?.hash ?? null;
 
-  const hash = createHash("sha256")
-    .update(canonical(entry, prevHash))
-    .digest("hex");
+  const hash = hashEntry(entry, prevHash);
 
   await tx.insert(auditLogs).values({
     workspaceId: entry.workspaceId,
@@ -83,22 +86,18 @@ export function verifyChain(
   let prevHash: string | null = null;
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    const expected: string = createHash("sha256")
-      .update(
-        canonical(
-          {
-            workspaceId: r.workspaceId,
-            actorId: r.actorId,
-            actorType: r.actorType as AuditEntry["actorType"],
-            action: r.action,
-            targetType: r.targetType ?? undefined,
-            targetId: r.targetId ?? undefined,
-            metadata: r.metadata ?? undefined,
-          },
-          prevHash,
-        ),
-      )
-      .digest("hex");
+    const expected: string = hashEntry(
+      {
+        workspaceId: r.workspaceId,
+        actorId: r.actorId,
+        actorType: r.actorType as AuditEntry["actorType"],
+        action: r.action,
+        targetType: r.targetType ?? undefined,
+        targetId: r.targetId ?? undefined,
+        metadata: r.metadata ?? undefined,
+      },
+      prevHash,
+    );
     if (r.prevHash !== prevHash || r.hash !== expected) {
       return { ok: false, brokenAt: i };
     }

@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DeskHive
 
-## Getting Started
+**The support desk that stays calm under load.** A multi-tenant, AI-assisted
+help desk: a public ticket portal, an agent inbox with SLA tracking, role-based
+teams, seat-based billing, and a tamper-evident audit trail — production-hardened
+from line one.
 
-First, run the development server:
+> Built by Basel Mahmoud as a portfolio reference for a genuinely
+> production-grade B2B SaaS (not a demo).
+
+- **Live:** _deploying — see Deployment below_
+- **Architecture:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) ·
+  **Decisions:** [`docs/adr/`](docs/adr) ·
+  **API:** [`docs/openapi.yaml`](docs/openapi.yaml) ·
+  **Hardening status:** [`PRODUCTION-HARDENING.md`](PRODUCTION-HARDENING.md)
+
+## Features
+
+- **Multi-tenant workspaces** with full data isolation (forced Postgres RLS).
+- **Customer portal** per workspace — submit & track tickets, no account needed.
+- **Agent inbox** — filters, search, live SLA countdowns, assignment.
+- **Ticket threads** — customer/agent messages, internal notes, status &
+  priority with optimistic concurrency.
+- **AI triage (Claude)** — auto summary, category, priority, draft reply
+  (degrades gracefully when unconfigured).
+- **RBAC** — owner / agent / viewer, least-privilege, last-owner protection.
+- **Seat-based billing (Stripe)** — checkout, customer portal, idempotent
+  webhooks.
+- **Tamper-evident audit log** — per-workspace SHA-256 hash chain, append-only.
+
+## Tech stack
+
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Drizzle ORM ·
+Neon Postgres · Clerk (auth) · Stripe (billing) · Anthropic Claude · Vitest +
+Playwright · GitHub Actions · Vercel.
+
+## Local development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.local.example .env.local   # then fill in the values
+npm run db:migrate                 # apply schema + RLS to your Neon DB
+npx tsx scripts/create-app-role.ts # create the non-bypassing runtime role
+npm run dev                        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Var | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Neon pooled connection (owner) |
+| `DIRECT_URL` | Neon unpooled connection (migrations) |
+| `APP_DATABASE_URL` | Pooled connection as the non-bypassing `deskhive_app` role |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` | Clerk auth |
+| `STRIPE_SECRET_KEY` / `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` / `STRIPE_WEBHOOK_SECRET` / `STRIPE_PRICE_PRO` | Billing |
+| `ANTHROPIC_API_KEY` / `CLASSIFY_MODEL` | AI triage |
+| `NEXT_PUBLIC_APP_URL` | Public base URL |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Billing and AI are optional — the app runs and degrades gracefully without them.
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Script | Description |
+| --- | --- |
+| `npm run dev` / `build` / `start` | Next.js dev / build / serve |
+| `npm run lint` / `typecheck` | ESLint / `tsc --noEmit` |
+| `npm test` | Vitest unit tests |
+| `npm run test:rls` | Integration test — proves cross-tenant isolation |
+| `npm run test:e2e` | Playwright smoke tests |
+| `npm run db:generate` / `db:migrate` | Drizzle migrations |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Testing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Unit** (Vitest): input validation/sanitization, audit hash-chain tamper
+  detection, id/slug helpers.
+- **Integration** (`test:rls`): provisions two tenants and asserts cross-tenant
+  reads **and** writes are blocked by RLS.
+- **E2E** (Playwright): landing, auth redirect, sign-in.
+- **CI** (GitHub Actions): lint + typecheck + tests + `npm audit` + build on
+  every push/PR.
 
-## Deploy on Vercel
+## Security highlights
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Forced RLS tenant isolation · parameterized queries + Zod validation ·
+rate limiting + honeypot on public endpoints · idempotent mutating APIs ·
+tamper-evident audit log · strict security headers (CSP/HSTS/…) · secrets never
+shipped to the client. Full status in
+[`PRODUCTION-HARDENING.md`](PRODUCTION-HARDENING.md).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment
+
+Deployed on **Vercel** (app) + **Neon** (database). On deploy: set the env vars
+above, run `db:migrate`, create the `deskhive_app` role, and point the Stripe
+webhook at `/api/webhooks/stripe`.
