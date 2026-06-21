@@ -8,12 +8,14 @@ export function BillingPanel({
   slug,
   plan,
   isOwner,
+  billingEnabled,
   subscriptionStatus,
   currentPeriodEnd,
 }: {
   slug: string;
   plan: string;
   isOwner: boolean;
+  billingEnabled: boolean;
   subscriptionStatus: string | null;
   currentPeriodEnd: string | null;
 }) {
@@ -50,24 +52,26 @@ export function BillingPanel({
               : "Up to 3 seats · manual triage"}
           </p>
         </div>
-        {isOwner ? (
-          isPro ? (
-            <form action={manageBillingAction.bind(null, slug)}>
-              <Button type="submit" variant="outline" size="sm">
-                Manage billing
-              </Button>
-            </form>
-          ) : (
-            <form action={upgradeAction.bind(null, slug)}>
-              <Button type="submit" size="sm">
-                <Sparkles size={14} /> Upgrade to Pro
-              </Button>
-            </form>
-          )
-        ) : (
+        {!isOwner ? (
           <span className="text-xs text-muted">
             Only owners can manage billing
           </span>
+        ) : !billingEnabled ? (
+          <span className="text-xs text-muted">
+            Self-serve billing activates once Stripe is configured.
+          </span>
+        ) : isPro ? (
+          <form action={manageBillingAction.bind(null, slug)}>
+            <Button type="submit" variant="outline" size="sm">
+              Manage billing
+            </Button>
+          </form>
+        ) : (
+          <form action={upgradeAction.bind(null, slug)}>
+            <Button type="submit" size="sm">
+              <Sparkles size={14} /> Upgrade to Pro
+            </Button>
+          </form>
         )}
       </div>
 

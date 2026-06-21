@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { Sparkles } from "lucide-react";
 import { requireUser } from "@/lib/auth";
+import { features } from "@/lib/env";
 import { getWorkspaceForUser } from "@/lib/services/workspaces";
 import { CopyButton } from "@/components/ui/copy-button";
 import { BillingPanel } from "@/components/app/billing-panel";
@@ -70,6 +71,7 @@ export default async function SettingsPage({
             slug={slug}
             plan={ws.plan}
             isOwner={isOwner}
+            billingEnabled={features().billing}
             subscriptionStatus={ws.subscriptionStatus}
             currentPeriodEnd={
               ws.currentPeriodEnd ? ws.currentPeriodEnd.toISOString() : null

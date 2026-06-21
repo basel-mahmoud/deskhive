@@ -8,7 +8,7 @@ from line one.
 > Built by Basel Mahmoud as a portfolio reference for a genuinely
 > production-grade B2B SaaS (not a demo).
 
-- **Live:** _deploying — see Deployment below_
+- **Live:** **https://deskhive-ten.vercel.app** · customer portal demo: `/p/northwind-support`
 - **Architecture:** [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) ·
   **Decisions:** [`docs/adr/`](docs/adr) ·
   **API:** [`docs/openapi.yaml`](docs/openapi.yaml) ·
