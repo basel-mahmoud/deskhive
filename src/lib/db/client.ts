@@ -22,20 +22,38 @@ if (typeof globalThis.WebSocket === "undefined") {
   neonConfig.webSocketConstructor = ws as unknown as typeof WebSocket;
 }
 
-// Reuse the pool across hot reloads / warm lambdas.
-const globalForDb = globalThis as unknown as { _deskhivePool?: Pool };
-const pool =
-  globalForDb._deskhivePool ??
-  new Pool({
-    // Prefer the non-bypassing runtime role so RLS is enforced; fall back to
-    // the default connection in environments where it isn't provisioned.
-    connectionString: serverEnv().APP_DATABASE_URL ?? serverEnv().DATABASE_URL,
-  });
-if (process.env.NODE_ENV !== "production") globalForDb._deskhivePool = pool;
-
-export const db = drizzle(pool, { schema });
-
 export type Db = NeonDatabase<typeof schema>;
+
+// Lazily create the pool/Drizzle instance on first use. Env is validated at
+// request time, not import time, so builds (and preview deploys without env)
+// never fail collecting page data — only real requests require configuration.
+const globalForDb = globalThis as unknown as {
+  _deskhivePool?: Pool;
+  _deskhiveDb?: Db;
+};
+
+function getDb(): Db {
+  if (globalForDb._deskhiveDb) return globalForDb._deskhiveDb;
+  const pool =
+    globalForDb._deskhivePool ??
+    new Pool({
+      // Prefer the non-bypassing runtime role so RLS is enforced; fall back to
+      // the default connection in environments where it isn't provisioned.
+      connectionString:
+        serverEnv().APP_DATABASE_URL ?? serverEnv().DATABASE_URL,
+    });
+  globalForDb._deskhivePool = pool;
+  globalForDb._deskhiveDb = drizzle(pool, { schema });
+  return globalForDb._deskhiveDb;
+}
+
+export const db: Db = new Proxy({} as Db, {
+  get(_target, prop) {
+    const real = getDb() as unknown as Record<string | symbol, unknown>;
+    const value = real[prop];
+    return typeof value === "function" ? value.bind(real) : value;
+  },
+});
 export type Tx = Parameters<Parameters<Db["transaction"]>[0]>[0];
 
 /** Run `fn` as the given Clerk user, with RLS enforcing their memberships. */
