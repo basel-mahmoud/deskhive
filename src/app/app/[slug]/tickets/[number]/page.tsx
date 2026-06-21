@@ -125,6 +125,7 @@ export default async function TicketPage({
         {/* Right rail */}
         <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-line bg-surface/30 p-5 lg:block">
           <TicketControls
+            key={`${ticket.version}-${ticket.status}-${ticket.priority}-${ticket.assigneeId ?? ""}`}
             slug={slug}
             ticketId={ticket.id}
             version={ticket.version}
