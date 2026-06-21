@@ -1,7 +1,10 @@
-"use client";
+import { cn } from "@/lib/utils";
 
-import { motion } from "motion/react";
-
+/**
+ * Lightweight CSS entrance wrapper. Uses the `.rise` keyframe (opacity + lift)
+ * with a per-item delay. CSS-driven on purpose: it renders reliably in
+ * production and degrades gracefully, unlike JS-gated scroll animations.
+ */
 export function Reveal({
   children,
   delay = 0,
@@ -12,14 +15,11 @@ export function Reveal({
   className?: string;
 }) {
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 22 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay }}
+    <div
+      className={cn("rise", className)}
+      style={delay ? { animationDelay: `${delay}s` } : undefined}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

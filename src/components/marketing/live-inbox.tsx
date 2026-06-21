@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 import { Sparkles, Clock, CircleDot } from "lucide-react";
 
 type Row = {
@@ -33,7 +32,7 @@ function SlaRing({ value }: { value: number }) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" className="shrink-0">
       <circle cx="12" cy="12" r={r} fill="none" stroke="var(--line-strong)" strokeWidth="2.5" />
-      <motion.circle
+      <circle
         cx="12"
         cy="12"
         r={r}
@@ -43,9 +42,7 @@ function SlaRing({ value }: { value: number }) {
         strokeLinecap="round"
         transform="rotate(-90 12 12)"
         strokeDasharray={c}
-        initial={{ strokeDashoffset: c }}
-        animate={{ strokeDashoffset: c * (1 - value) }}
-        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+        strokeDashoffset={c * (1 - value)}
       />
     </svg>
   );
@@ -59,12 +56,9 @@ export function LiveInbox() {
   }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24, rotateX: 6 }}
-      animate={{ opacity: 1, y: 0, rotateX: 0 }}
-      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-      className="card relative overflow-hidden shadow-[var(--shadow)]"
-      style={{ perspective: 1000 }}
+    <div
+      className="card rise relative overflow-hidden shadow-[var(--shadow)]"
+      style={{ animationDelay: "0.2s" }}
     >
       {/* window chrome */}
       <div className="flex items-center justify-between border-b border-line bg-surface-2/60 px-4 py-3">
@@ -83,22 +77,17 @@ export function LiveInbox() {
         {ROWS.map((row, i) => {
           const scanning = scan === i;
           return (
-            <motion.div
+            <div
               key={row.id}
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 + i * 0.12, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="relative flex items-center gap-3 px-4 py-3.5"
+              className="rise relative flex items-center gap-3 px-4 py-3.5"
+              style={{ animationDelay: `${0.35 + i * 0.12}s` }}
             >
-              {scanning && (
-                <motion.div
-                  layoutId="scan"
-                  className="absolute inset-0 bg-accent/[0.06]"
-                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                />
-              )}
+              <div
+                className="pointer-events-none absolute inset-0 bg-accent/[0.06] transition-opacity duration-500"
+                style={{ opacity: scanning ? 1 : 0 }}
+              />
               <SlaRing value={row.sla} />
-              <div className="min-w-0 flex-1">
+              <div className="relative min-w-0 flex-1">
                 <div className="truncate text-sm font-medium text-ink">
                   {row.subject}
                 </div>
@@ -108,13 +97,9 @@ export function LiveInbox() {
               </div>
               <div className="relative flex items-center gap-2">
                 {scanning ? (
-                  <motion.span
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/12 px-2 py-0.5 text-[0.68rem] font-medium text-accent"
-                  >
+                  <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/12 px-2 py-0.5 text-[0.68rem] font-medium text-accent">
                     <Sparkles size={11} /> triaging
-                  </motion.span>
+                  </span>
                 ) : (
                   <span
                     className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[0.68rem] font-medium capitalize"
@@ -127,7 +112,7 @@ export function LiveInbox() {
                   </span>
                 )}
               </div>
-            </motion.div>
+            </div>
           );
         })}
       </div>
@@ -138,6 +123,6 @@ export function LiveInbox() {
         </span>
         <span>SLA met · 98.2%</span>
       </div>
-    </motion.div>
+    </div>
   );
 }
