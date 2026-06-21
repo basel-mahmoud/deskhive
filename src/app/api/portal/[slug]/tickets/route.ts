@@ -1,4 +1,4 @@
-import type { NextRequest } from "next/server";
+import { after, type NextRequest } from "next/server";
 import { clientIp, json, tooManyRequests } from "@/lib/http";
 import { rateLimit } from "@/lib/services/rate-limit";
 import {
@@ -45,8 +45,9 @@ export async function POST(
 
   const run = async () => {
     const { id, number } = await createTicketFromPortal(ws.id, parsed.data);
-    // Fire-and-forget AI triage; never blocks the customer's submission.
-    void maybeTriageTicket(ws.id, id);
+    // Run AI triage after the response (survives serverless teardown on Vercel)
+    // and never blocks the customer's submission.
+    after(() => maybeTriageTicket(ws.id, id));
     return { statusCode: 201, body: { number } };
   };
 

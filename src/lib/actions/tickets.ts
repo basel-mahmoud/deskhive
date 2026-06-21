@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { redirect } from "next/navigation";
 import { requireUser, AuthzError } from "@/lib/auth";
 import { getWorkspaceForUser } from "@/lib/services/workspaces";
@@ -46,8 +47,8 @@ export async function createTicketAction(
     workspace.id,
     parsed.data,
   );
-  // Fire-and-forget AI triage (no-op if AI not configured).
-  void maybeTriageTicket(workspace.id, id);
+  // AI triage after the response (no-op if AI not configured).
+  after(() => maybeTriageTicket(workspace.id, id));
   redirect(`/app/${slug}/tickets/${number}`);
 }
 
