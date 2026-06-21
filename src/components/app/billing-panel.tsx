@@ -79,7 +79,7 @@ export function BillingPanel({
         <ul className="mt-4 grid gap-2 text-sm text-ink-dim sm:grid-cols-2">
           {[
             "Unlimited seats",
-            "Claude AI triage & draft replies",
+            "Gemini AI triage & draft replies",
             "Priority SLA policies",
             "Everything in Free",
           ].map((x) => (

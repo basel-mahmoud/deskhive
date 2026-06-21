@@ -22,7 +22,7 @@ const features = [
   {
     icon: Sparkles,
     title: "AI triage that actually helps",
-    body: "Every inbound ticket is summarised, categorised, and prioritised by Claude — with a suggested first reply your agents can send or edit.",
+    body: "Every inbound ticket is summarised, categorised, and prioritised by Gemini — with a suggested first reply your agents can send or edit.",
   },
   {
     icon: Timer,
@@ -72,7 +72,7 @@ export default function Home() {
           <div>
             <div className="rise inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-dim">
               <span className="h-1.5 w-1.5 rounded-full bg-accent pulse-ring" />
-              Now with Claude-powered triage
+              Now with Gemini-powered triage
             </div>
             <h1
               className="rise mt-6 font-display text-[2.7rem] leading-[1.04] font-semibold tracking-tight sm:text-6xl"
@@ -277,7 +277,7 @@ export default function Home() {
                 <ul className="mt-6 space-y-2.5 text-sm text-ink-dim">
                   {[
                     "Unlimited seats",
-                    "Claude AI triage & draft replies",
+                    "Gemini AI triage & draft replies",
                     "Priority SLA policies",
                     "Everything in Free",
                   ].map((x) => (

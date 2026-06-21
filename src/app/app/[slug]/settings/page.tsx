@@ -51,8 +51,8 @@ export default async function SettingsPage({
             </div>
             <p className="mt-1 text-sm text-muted">
               {ws.aiEnabled
-                ? "New tickets are automatically summarised and prioritised by Claude."
-                : "Available on the Pro plan. New tickets are triaged by Claude with a suggested reply."}
+                ? "New tickets are automatically summarised and prioritised by Gemini."
+                : "Available on the Pro plan. New tickets are triaged by Gemini with a suggested reply."}
             </p>
             <div className="mt-3">
               <span
