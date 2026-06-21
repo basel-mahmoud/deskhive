@@ -58,36 +58,46 @@ export async function maybeTriageTicket(
     if (!prepared) return;
 
     const model = serverEnv().CLASSIFY_MODEL;
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": serverEnv().GEMINI_API_KEY,
-        },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM }] },
-          contents: [
+    const requestBody = JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM }] },
+      contents: [
+        {
+          role: "user",
+          parts: [
             {
-              role: "user",
-              parts: [
-                {
-                  text: `Subject: ${prepared.subject}\n\nMessage:\n${prepared.body}`,
-                },
-              ],
+              text: `Subject: ${prepared.subject}\n\nMessage:\n${prepared.body}`,
             },
           ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            temperature: 0.2,
-            maxOutputTokens: 700,
-          },
-        }),
+        },
+      ],
+      generationConfig: {
+        responseMimeType: "application/json",
+        temperature: 0.2,
+        maxOutputTokens: 700,
       },
-    );
-    if (!res.ok) {
-      console.error("gemini triage http", res.status, await res.text());
+    });
+
+    // Retry transient capacity errors (429/503) with backoff — the free tier
+    // occasionally returns "high demand". 4xx other than 429 are not retried.
+    let res: Response | null = null;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": serverEnv().GEMINI_API_KEY,
+          },
+          body: requestBody,
+        },
+      );
+      if (res.ok) break;
+      if (res.status !== 429 && res.status !== 503) break;
+      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+    }
+    if (!res || !res.ok) {
+      console.error("gemini triage http", res?.status, await res?.text());
       return;
     }
 
