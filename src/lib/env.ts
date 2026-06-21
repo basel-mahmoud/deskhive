@@ -20,8 +20,8 @@ const serverSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().optional().default(""),
   STRIPE_PRICE_PRO: z.string().optional().default(""),
 
-  ANTHROPIC_API_KEY: z.string().optional().default(""),
-  CLASSIFY_MODEL: z.string().optional().default("claude-sonnet-4-6"),
+  GEMINI_API_KEY: z.string().optional().default(""),
+  CLASSIFY_MODEL: z.string().optional().default("gemini-2.5-flash"),
 
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
@@ -64,7 +64,7 @@ export function features() {
   const e = serverEnv();
   return {
     billing: Boolean(e.STRIPE_SECRET_KEY && e.STRIPE_PRICE_PRO),
-    ai: Boolean(e.ANTHROPIC_API_KEY),
+    ai: Boolean(e.GEMINI_API_KEY),
     clerkWebhook: Boolean(e.CLERK_WEBHOOK_SIGNING_SECRET),
   };
 }

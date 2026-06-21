@@ -21,7 +21,7 @@ from line one.
 - **Agent inbox** — filters, search, live SLA countdowns, assignment.
 - **Ticket threads** — customer/agent messages, internal notes, status &
   priority with optimistic concurrency.
-- **AI triage (Claude)** — auto summary, category, priority, draft reply
+- **AI triage (Google Gemini)** — auto summary, category, priority, draft reply
   (degrades gracefully when unconfigured).
 - **RBAC** — owner / agent / viewer, least-privilege, last-owner protection.
 - **Seat-based billing (Stripe)** — checkout, customer portal, idempotent
@@ -31,7 +31,7 @@ from line one.
 ## Tech stack
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Drizzle ORM ·
-Neon Postgres · Clerk (auth) · Stripe (billing) · Anthropic Claude · Vitest +
+Neon Postgres · Clerk (auth) · Stripe (billing) · Google Gemini (AI) · Vitest +
 Playwright · GitHub Actions · Vercel.
 
 ## Local development
@@ -53,7 +53,7 @@ npm run dev                        # http://localhost:3000
 | `APP_DATABASE_URL` | Pooled connection as the non-bypassing `deskhive_app` role |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` | Clerk auth |
 | `STRIPE_SECRET_KEY` / `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` / `STRIPE_WEBHOOK_SECRET` / `STRIPE_PRICE_PRO` | Billing |
-| `ANTHROPIC_API_KEY` / `CLASSIFY_MODEL` | AI triage |
+| `GEMINI_API_KEY` / `CLASSIFY_MODEL` | AI triage (free Google AI Studio key) |
 | `NEXT_PUBLIC_APP_URL` | Public base URL |
 
 Billing and AI are optional — the app runs and degrades gracefully without them.

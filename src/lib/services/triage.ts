@@ -1,5 +1,4 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
 import { and, asc, eq, isNull } from "drizzle-orm";
 import { withSystem } from "@/lib/db/client";
 import { ticketMessages, tickets, workspaces } from "@/lib/db/schema";
@@ -17,14 +16,14 @@ type TriageOutput = {
 };
 
 const SYSTEM = `You are a senior customer-support triage assistant.
-Given a support ticket, respond ONLY with minified JSON matching:
+Given a support ticket, respond ONLY with JSON matching exactly:
 {"summary": string (<=200 chars), "category": one of ["Billing","Bug","How-to","Account","Feature request","Outage","Other"], "priority": one of ["low","normal","high","urgent"], "draftReply": string (a concise, empathetic first reply the agent can edit, <=120 words)}.
-Judge priority by customer impact and urgency. Do not include any text outside the JSON.`;
+Judge priority by customer impact and urgency.`;
 
 /**
- * Triage a ticket with Claude. Idempotent (skips if already triaged), and a
- * no-op when AI is not configured or disabled for the workspace, so the product
- * degrades gracefully to manual triage.
+ * Triage a ticket with Google Gemini (free AI Studio tier). Idempotent (skips
+ * if already triaged) and a no-op when AI is not configured or disabled for the
+ * workspace, so the product degrades gracefully to manual triage.
  */
 export async function maybeTriageTicket(
   workspaceId: string,
@@ -42,10 +41,7 @@ export async function maybeTriageTicket(
       if (!ws[0]?.aiEnabled) return null;
 
       const t = await tx
-        .select({
-          subject: tickets.subject,
-          aiSummary: tickets.aiSummary,
-        })
+        .select({ subject: tickets.subject, aiSummary: tickets.aiSummary })
         .from(tickets)
         .where(and(eq(tickets.id, ticketId), isNull(tickets.aiSummary)))
         .limit(1);
@@ -61,23 +57,46 @@ export async function maybeTriageTicket(
     });
     if (!prepared) return;
 
-    const client = new Anthropic({ apiKey: serverEnv().ANTHROPIC_API_KEY });
-    const resp = await client.messages.create({
-      model: serverEnv().CLASSIFY_MODEL,
-      max_tokens: 600,
-      system: SYSTEM,
-      messages: [
-        {
-          role: "user",
-          content: `Subject: ${prepared.subject}\n\nMessage:\n${prepared.body}`,
+    const model = serverEnv().CLASSIFY_MODEL;
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": serverEnv().GEMINI_API_KEY,
         },
-      ],
-    });
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: SYSTEM }] },
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: `Subject: ${prepared.subject}\n\nMessage:\n${prepared.body}`,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.2,
+            maxOutputTokens: 700,
+          },
+        }),
+      },
+    );
+    if (!res.ok) {
+      console.error("gemini triage http", res.status, await res.text());
+      return;
+    }
 
-    const text = resp.content
-      .map((b) => (b.type === "text" ? b.text : ""))
-      .join("")
-      .trim();
+    const data = (await res.json()) as {
+      candidates?: { content?: { parts?: { text?: string }[] } }[];
+    };
+    const text =
+      data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ??
+      "";
     const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
     const parsed = JSON.parse(json) as Partial<TriageOutput>;
     const priority: Priority = PRIORITIES.includes(parsed.priority as Priority)
@@ -102,7 +121,7 @@ export async function maybeTriageTicket(
         action: "ticket.triaged",
         targetType: "ticket",
         targetId: ticketId,
-        metadata: { category: parsed.category, priority },
+        metadata: { category: parsed.category, priority, model },
       });
     });
   } catch (err) {
