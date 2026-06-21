@@ -1,65 +1,319 @@
-import Image from "next/image";
+import {
+  Sparkles,
+  Timer,
+  ShieldCheck,
+  Users,
+  Globe,
+  ScrollText,
+  Lock,
+  KeyRound,
+  Activity,
+  GitBranch,
+  ArrowRight,
+} from "lucide-react";
+import { MarketingNav } from "@/components/marketing/nav";
+import { LiveInbox } from "@/components/marketing/live-inbox";
+import { Reveal } from "@/components/marketing/reveal";
+import { ButtonLink } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
+
+const features = [
+  {
+    icon: Sparkles,
+    title: "AI triage that actually helps",
+    body: "Every inbound ticket is summarised, categorised, and prioritised by Claude — with a suggested first reply your agents can send or edit.",
+  },
+  {
+    icon: Timer,
+    title: "SLA clocks on every ticket",
+    body: "Per-priority response targets with live countdown rings. See what is about to breach before it does, not after.",
+  },
+  {
+    icon: Users,
+    title: "Roles that mean something",
+    body: "Owner, agent and viewer with least-privilege access — enforced in the app and again in the database with row-level security.",
+  },
+  {
+    icon: Globe,
+    title: "A portal per workspace",
+    body: "Customers file and track tickets at your own branded portal. No account required, rate-limited, abuse-resistant.",
+  },
+  {
+    icon: ScrollText,
+    title: "Tamper-evident audit trail",
+    body: "Every state change is hash-chained and append-only. Export a verifiable history for compliance and incident reviews.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Multi-tenant by design",
+    body: "Each workspace is fully isolated. One forced RLS policy stands between every query and another tenant's data.",
+  },
+];
+
+const security = [
+  { icon: Lock, label: "Forced row-level security" },
+  { icon: KeyRound, label: "Short-lived sessions & token expiry" },
+  { icon: Activity, label: "Rate limiting & abuse prevention" },
+  { icon: ScrollText, label: "Hash-chained audit logs" },
+  { icon: ShieldCheck, label: "Input validation & injection-safe queries" },
+  { icon: GitBranch, label: "Idempotent, retry-safe mutations" },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="relative min-h-screen bg-bg text-ink">
+      <MarketingNav />
+
+      {/* ---------------------------------------------------------------- Hero */}
+      <section className="relative overflow-hidden px-5 pt-32 pb-20 sm:pt-40">
+        <div className="hive-grid pointer-events-none absolute inset-0 -z-10 opacity-60" />
+        <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
+          <div>
+            <div className="rise inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-ink-dim">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent pulse-ring" />
+              Now with Claude-powered triage
+            </div>
+            <h1
+              className="rise mt-6 font-display text-[2.7rem] leading-[1.04] font-semibold tracking-tight sm:text-6xl"
+              style={{ animationDelay: "0.05s" }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              The support desk
+              <br />
+              that stays{" "}
+              <span className="relative whitespace-nowrap text-accent">
+                calm
+                <svg
+                  className="absolute -bottom-2 left-0 w-full"
+                  height="10"
+                  viewBox="0 0 200 10"
+                  fill="none"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d="M2 7C40 2 160 2 198 7"
+                    stroke="var(--accent)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>{" "}
+              under load.
+            </h1>
+            <p
+              className="rise mt-6 max-w-md text-lg text-ink-dim"
+              style={{ animationDelay: "0.1s" }}
             >
-              Learning
-            </a>{" "}
-            center.
+              DeskHive turns inbound chaos into a measurable queue. AI triage,
+              SLA clocks, role-based teams and a customer portal — multi-tenant
+              and production-hardened from line one.
+            </p>
+            <div
+              className="rise mt-8 flex flex-wrap items-center gap-3"
+              style={{ animationDelay: "0.15s" }}
+            >
+              <ButtonLink href="/sign-up" size="lg" className="group">
+                Start free
+                <ArrowRight
+                  size={17}
+                  className="transition-transform group-hover:translate-x-0.5"
+                />
+              </ButtonLink>
+              <ButtonLink href="#features" variant="outline" size="lg">
+                See how it works
+              </ButtonLink>
+            </div>
+            <p
+              className="rise mt-4 font-mono text-xs text-muted"
+              style={{ animationDelay: "0.2s" }}
+            >
+              No credit card · 3 seats free · live in 2 minutes
+            </p>
+          </div>
+
+          <div className="lg:pl-4">
+            <LiveInbox />
+          </div>
+        </div>
+      </section>
+
+      {/* ----------------------------------------------------------- Stat band */}
+      <section className="border-y border-line bg-surface/40">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-line md:grid-cols-4">
+          {[
+            ["7m", "median first response"],
+            ["98.2%", "SLA targets met"],
+            ["100%", "tenant isolation"],
+            ["0", "shared rows, ever"],
+          ].map(([n, l]) => (
+            <div key={l} className="px-5 py-7 text-center">
+              <div className="font-display text-3xl font-semibold text-ink">
+                {n}
+              </div>
+              <div className="mt-1 text-xs text-muted">{l}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ Features */}
+      <section id="features" className="px-5 py-24">
+        <div className="mx-auto max-w-6xl">
+          <Reveal>
+            <p className="font-mono text-xs tracking-widest text-accent uppercase">
+              The product
+            </p>
+            <h2 className="mt-3 max-w-2xl font-display text-3xl font-semibold sm:text-4xl">
+              Everything a support team needs, nothing that gets in the way.
+            </h2>
+          </Reveal>
+          <div className="mt-14 grid gap-px overflow-hidden rounded-[var(--radius-xl)] border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
+              <Reveal key={f.title} delay={(i % 3) * 0.06}>
+                <div className="group h-full bg-surface p-7 transition-colors hover:bg-surface-2">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-line-strong bg-bg text-accent transition-transform duration-300 ease-[var(--ease-expo)] group-hover:-translate-y-0.5">
+                    <f.icon size={20} />
+                  </div>
+                  <h3 className="mt-5 text-lg font-semibold">{f.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-dim">
+                    {f.body}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------ Security */}
+      <section
+        id="security"
+        className="relative overflow-hidden border-y border-line bg-surface/30 px-5 py-24"
+      >
+        <div className="dotgrid pointer-events-none absolute inset-0 -z-10 opacity-40" />
+        <div className="mx-auto max-w-6xl">
+          <Reveal className="max-w-2xl">
+            <p className="font-mono text-xs tracking-widest text-accent uppercase">
+              Built to be trusted
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-semibold sm:text-4xl">
+              Production-grade, not demo-grade.
+            </h2>
+            <p className="mt-4 text-ink-dim">
+              DeskHive ships with the controls most products bolt on later:
+              tenant isolation enforced in the database, audit trails you can
+              verify, and abuse prevention on every public surface.
+            </p>
+          </Reveal>
+          <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {security.map((s, i) => (
+              <Reveal key={s.label} delay={(i % 3) * 0.05}>
+                <div className="flex items-center gap-3 rounded-[var(--radius-md)] border border-line bg-bg px-4 py-3.5">
+                  <s.icon size={18} className="shrink-0 text-success" />
+                  <span className="text-sm text-ink">{s.label}</span>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------- Pricing */}
+      <section id="pricing" className="px-5 py-24">
+        <div className="mx-auto max-w-5xl">
+          <Reveal className="text-center">
+            <h2 className="font-display text-3xl font-semibold sm:text-4xl">
+              Simple, seat-based pricing
+            </h2>
+            <p className="mt-3 text-ink-dim">
+              Start free. Upgrade when your team grows.
+            </p>
+          </Reveal>
+          <div className="mt-12 grid gap-5 md:grid-cols-2">
+            <Reveal>
+              <div className="card h-full p-8">
+                <h3 className="font-display text-xl font-semibold">Free</h3>
+                <p className="mt-1 text-sm text-muted">For small teams</p>
+                <div className="mt-5 font-display text-4xl font-semibold">
+                  $0
+                  <span className="text-base font-normal text-muted">/mo</span>
+                </div>
+                <ul className="mt-6 space-y-2.5 text-sm text-ink-dim">
+                  {[
+                    "Up to 3 seats",
+                    "Unlimited tickets",
+                    "Customer portal",
+                    "SLA tracking & audit log",
+                  ].map((x) => (
+                    <li key={x} className="flex items-center gap-2">
+                      <span className="text-success">✓</span> {x}
+                    </li>
+                  ))}
+                </ul>
+                <ButtonLink
+                  href="/sign-up"
+                  variant="outline"
+                  className="mt-7 w-full"
+                >
+                  Get started
+                </ButtonLink>
+              </div>
+            </Reveal>
+            <Reveal delay={0.08}>
+              <div className="card relative h-full overflow-hidden border-accent/40 p-8">
+                <div className="absolute top-0 right-0 rounded-bl-[var(--radius-md)] bg-accent px-3 py-1 text-[0.7rem] font-medium text-accent-ink">
+                  Most popular
+                </div>
+                <h3 className="font-display text-xl font-semibold">Pro</h3>
+                <p className="mt-1 text-sm text-muted">
+                  For growing support orgs
+                </p>
+                <div className="mt-5 font-display text-4xl font-semibold">
+                  $24
+                  <span className="text-base font-normal text-muted">
+                    /seat/mo
+                  </span>
+                </div>
+                <ul className="mt-6 space-y-2.5 text-sm text-ink-dim">
+                  {[
+                    "Unlimited seats",
+                    "Claude AI triage & draft replies",
+                    "Priority SLA policies",
+                    "Everything in Free",
+                  ].map((x) => (
+                    <li key={x} className="flex items-center gap-2">
+                      <span className="text-accent">✓</span> {x}
+                    </li>
+                  ))}
+                </ul>
+                <ButtonLink href="/sign-up" className="mt-7 w-full">
+                  Start free trial
+                </ButtonLink>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ------------------------------------------------------------- Footer */}
+      <footer className="border-t border-line px-5 py-12">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
+          <Logo />
+          <p className="font-mono text-xs text-muted">
+            Built by Basel Mahmoud · multi-tenant SaaS reference
           </p>
+          <div className="flex gap-6 text-sm text-ink-dim">
+            <a href="#features" className="hover:text-ink">
+              Features
+            </a>
+            <a href="#pricing" className="hover:text-ink">
+              Pricing
+            </a>
+            <a href="/sign-in" className="hover:text-ink">
+              Sign in
+            </a>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </footer>
+    </main>
   );
 }
