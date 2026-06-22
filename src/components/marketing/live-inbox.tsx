@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
 import { Sparkles, Clock, CircleDot } from "lucide-react";
 
 type Row = {
@@ -77,15 +78,20 @@ export function LiveInbox() {
         {ROWS.map((row, i) => {
           const scanning = scan === i;
           return (
-            <div
+            <motion.div
               key={row.id}
+              whileHover={{ x: 3 }}
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
               className="rise relative flex items-center gap-3 px-4 py-3.5"
               style={{ animationDelay: `${0.35 + i * 0.12}s` }}
             >
-              <div
-                className="pointer-events-none absolute inset-0 bg-accent/[0.06] transition-opacity duration-500"
-                style={{ opacity: scanning ? 1 : 0 }}
-              />
+              {scanning && (
+                <motion.div
+                  layoutId="inbox-scan"
+                  transition={{ type: "spring", stiffness: 320, damping: 30 }}
+                  className="pointer-events-none absolute inset-0 border-l-2 border-accent bg-accent/[0.07]"
+                />
+              )}
               <SlaRing value={row.sla} />
               <div className="relative min-w-0 flex-1">
                 <div className="truncate text-sm font-medium text-ink">
@@ -97,9 +103,13 @@ export function LiveInbox() {
               </div>
               <div className="relative flex items-center gap-2">
                 {scanning ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/12 px-2 py-0.5 text-[0.68rem] font-medium text-accent">
+                  <motion.span
+                    initial={{ scale: 0.85 }}
+                    animate={{ scale: 1 }}
+                    className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/12 px-2 py-0.5 text-[0.68rem] font-medium text-accent"
+                  >
                     <Sparkles size={11} /> triaging
-                  </span>
+                  </motion.span>
                 ) : (
                   <span
                     className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[0.68rem] font-medium capitalize"
@@ -112,7 +122,7 @@ export function LiveInbox() {
                   </span>
                 )}
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>

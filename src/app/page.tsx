@@ -15,6 +15,9 @@ import {
 import { MarketingNav } from "@/components/marketing/nav";
 import { LiveInbox } from "@/components/marketing/live-inbox";
 import { Reveal } from "@/components/marketing/reveal";
+import { FeatureCard } from "@/components/motion/feature-card";
+import { AnimatedCounter } from "@/components/motion/animated-counter";
+import { HeroOrbs } from "@/components/motion/hero-orbs";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 
@@ -67,6 +70,7 @@ export default function Home() {
 
       {/* ---------------------------------------------------------------- Hero */}
       <section className="relative overflow-hidden px-5 pt-32 pb-20 sm:pt-40">
+        <HeroOrbs />
         <div className="hive-grid pointer-events-none absolute inset-0 -z-10 opacity-60" />
         <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
@@ -140,19 +144,15 @@ export default function Home() {
       {/* ----------------------------------------------------------- Stat band */}
       <section className="border-y border-line bg-surface/40">
         <div className="mx-auto grid max-w-6xl grid-cols-2 divide-x divide-line md:grid-cols-4">
-          {[
-            ["7m", "median first response"],
-            ["98.2%", "SLA targets met"],
-            ["100%", "tenant isolation"],
-            ["0", "shared rows, ever"],
-          ].map(([n, l]) => (
-            <div key={l} className="px-5 py-7 text-center">
-              <div className="font-display text-3xl font-semibold text-ink">
-                {n}
-              </div>
-              <div className="mt-1 text-xs text-muted">{l}</div>
-            </div>
-          ))}
+          <AnimatedCounter value={7} suffix="m" label="median first response" />
+          <AnimatedCounter
+            value={98.2}
+            decimals={1}
+            suffix="%"
+            label="SLA targets met"
+          />
+          <AnimatedCounter value={100} suffix="%" label="tenant isolation" />
+          <AnimatedCounter value={0} label="shared rows, ever" />
         </div>
       </section>
 
@@ -169,16 +169,12 @@ export default function Home() {
           </Reveal>
           <div className="mt-14 grid gap-px overflow-hidden rounded-[var(--radius-xl)] border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
-              <Reveal key={f.title} delay={(i % 3) * 0.06}>
-                <div className="group h-full bg-surface p-7 transition-colors hover:bg-surface-2">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-line-strong bg-bg text-accent transition-transform duration-300 ease-[var(--ease-expo)] group-hover:-translate-y-0.5">
-                    <f.icon size={20} />
-                  </div>
-                  <h3 className="mt-5 text-lg font-semibold">{f.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-dim">
-                    {f.body}
-                  </p>
-                </div>
+              <Reveal key={f.title} delay={(i % 3) * 0.06} className="h-full">
+                <FeatureCard
+                  icon={<f.icon size={20} />}
+                  title={f.title}
+                  body={f.body}
+                />
               </Reveal>
             ))}
           </div>
