@@ -137,7 +137,7 @@ export default function Home() {
           </div>
 
           <div className="relative flex flex-col items-center gap-6 lg:pl-4">
-            <LiveMascot className="w-40 sm:w-48" />
+            <LiveMascot className="w-56 sm:w-64" />
             <LiveInbox />
           </div>
         </div>
