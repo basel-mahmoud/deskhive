@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/nav";
 import { LiveInbox } from "@/components/marketing/live-inbox";
-import { CornerMascot } from "@/components/marketing/corner-mascot";
 import { Reveal } from "@/components/marketing/reveal";
 import { FeatureCard } from "@/components/motion/feature-card";
 import { AnimatedCounter } from "@/components/motion/animated-counter";
@@ -137,7 +136,17 @@ export default function Home() {
           </div>
 
           <div className="relative flex flex-col items-center lg:pl-4">
-            <LiveInbox />
+            <div className="relative">
+              {/* idle mascot perched on top of the inbox card */}
+              {/* eslint-disable-next-line @next/next/no-img-element -- animated GIF; next/image would freeze it */}
+              <img
+                src="/brand/mascot.gif"
+                alt=""
+                aria-hidden
+                className="pointer-events-none absolute right-2 -top-14 z-20 w-24 drop-shadow-[0_10px_16px_rgba(0,0,0,0.45)] sm:right-3.5 sm:-top-[66px] sm:w-[108px]"
+              />
+              <LiveInbox />
+            </div>
           </div>
         </div>
       </section>
@@ -312,8 +321,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-
-      <CornerMascot />
     </main>
   );
 }
