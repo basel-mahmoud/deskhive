@@ -1,34 +1,87 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 /**
  * The DeskHive mascot strolling back and forth along the top edge of the inbox
- * card. The character's own animation (a 16-frame sprite sheet) loops the whole
- * time, while a separate slow keyframe walks it right→left→right with a pause at
- * each end (where it just idles in place). Absolutely positioned against the
- * card-hugging wrapper, pointer-events-none, reduced-motion aware.
+ * card, facing its direction of travel. The sprite sheet has 32 frames: 0–15
+ * face right, 16–31 face left. A small ticker advances the character animation
+ * and walks it across the card — moving right it plays the right-facing frames,
+ * moving left the left-facing frames, with a brief turn-around pause at each end.
+ * Anchored to the card-hugging wrapper, pointer-events-none, reduced-motion aware.
  */
+const NF = 16; // frames per direction
+const FW = 104; // displayed frame size (px)
+const SHEET = 32 * FW; // displayed sheet width
+const TICK = 140; // ms per animation frame
+const CROSS_TICKS = 60; // ticks to cross the card (~8.4s)
+const PAUSE_TICKS = 5; // brief idle/turn pause at each end
+
 export function InboxWalker() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.style.left = "6px";
+      el.style.backgroundPositionX = "0px"; // frame 0, facing right
+      return;
+    }
+
+    let dir = 1; // 1 = walking right (frames 0–15), -1 = walking left (frames 16–31)
+    let frame = 0;
+    let pos = 6;
+    let pause = 0;
+    const minPos = 6;
+    const maxPos = () =>
+      Math.max(minPos, (el.parentElement?.clientWidth ?? 360) - FW - 6);
+
+    const draw = () => {
+      const off = dir === 1 ? 0 : NF;
+      el.style.backgroundPositionX = `-${(off + frame) * FW}px`;
+      el.style.left = `${pos}px`;
+    };
+    draw();
+
+    const id = window.setInterval(() => {
+      frame = (frame + 1) % NF;
+      if (pause > 0) {
+        pause--;
+        draw();
+        return;
+      }
+      const max = maxPos();
+      pos += dir * ((max - minPos) / CROSS_TICKS);
+      if (dir === 1 && pos >= max) {
+        pos = max;
+        dir = -1;
+        pause = PAUSE_TICKS;
+      } else if (dir === -1 && pos <= minPos) {
+        pos = minPos;
+        dir = 1;
+        pause = PAUSE_TICKS;
+      }
+      draw();
+    }, TICK);
+
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <>
-      <div aria-hidden className="dh-walk pointer-events-none" />
+      <div ref={ref} aria-hidden className="dh-walk pointer-events-none" />
       <style>{`
         .dh-walk {
           position: absolute;
           z-index: 20;
-          top: -90px;
+          top: -97px;
           left: 6px;
-          width: 104px;
-          height: 104px;
-          background: url(/brand/mascot-walk.png) 0 0 / 1664px 104px no-repeat;
+          width: ${FW}px;
+          height: ${FW}px;
+          background: url(/brand/mascot-walk.png) 0 0 / ${SHEET}px ${FW}px no-repeat;
           filter: drop-shadow(0 8px 10px rgba(0,0,0,0.4));
-          animation: dhFrames 2.6s steps(16) infinite, dhWalk 16s ease-in-out infinite;
-        }
-        @keyframes dhFrames { from { background-position-x: 0; } to { background-position-x: -1664px; } }
-        @keyframes dhWalk {
-          0%, 7%    { left: calc(100% - 110px); }
-          47%, 57%  { left: 6px; }
-          97%, 100% { left: calc(100% - 110px); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .dh-walk { animation: dhFrames 3.2s steps(16) infinite; left: calc(100% - 110px); }
         }
       `}</style>
     </>

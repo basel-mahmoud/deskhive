@@ -137,7 +137,7 @@ export default function Home() {
           </div>
 
           <div className="relative flex flex-col items-center lg:pl-4">
-            <div className="relative">
+            <div className="relative w-full max-w-[440px]">
               {/* mascot strolls back and forth along the top edge of the card */}
               <InboxWalker />
               <LiveInbox />

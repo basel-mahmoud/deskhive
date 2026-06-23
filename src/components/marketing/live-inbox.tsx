@@ -58,7 +58,7 @@ export function LiveInbox() {
 
   return (
     <div
-      className="card rise relative overflow-hidden shadow-[var(--shadow)]"
+      className="card rise relative w-full overflow-hidden shadow-[var(--shadow)]"
       style={{ animationDelay: "0.2s" }}
     >
       {/* window chrome */}
