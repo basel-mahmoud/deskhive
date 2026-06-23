@@ -18,7 +18,6 @@ import { Reveal } from "@/components/marketing/reveal";
 import { FeatureCard } from "@/components/motion/feature-card";
 import { AnimatedCounter } from "@/components/motion/animated-counter";
 import { HeroOrbs } from "@/components/motion/hero-orbs";
-import { LiveMascot } from "@/components/motion/live-mascot";
 import { ButtonLink } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 
@@ -136,8 +135,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="relative flex flex-col items-center gap-6 lg:pl-4">
-            <LiveMascot className="w-56 sm:w-64" />
+          <div className="relative flex flex-col items-center lg:pl-4">
             <LiveInbox />
           </div>
         </div>
