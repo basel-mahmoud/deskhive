@@ -143,7 +143,7 @@ export default function Home() {
                 src="/brand/mascot.gif"
                 alt=""
                 aria-hidden
-                className="pointer-events-none absolute right-2 -top-14 z-20 w-24 drop-shadow-[0_10px_16px_rgba(0,0,0,0.45)] sm:right-3.5 sm:-top-[66px] sm:w-[108px]"
+                className="pointer-events-none absolute right-2 -top-[80px] z-20 w-24 drop-shadow-[0_10px_16px_rgba(0,0,0,0.45)] sm:right-3.5 sm:-top-[92px] sm:w-[108px]"
               />
               <LiveInbox />
             </div>
