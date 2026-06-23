@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { MarketingNav } from "@/components/marketing/nav";
 import { LiveInbox } from "@/components/marketing/live-inbox";
+import { CornerMascot } from "@/components/marketing/corner-mascot";
 import { Reveal } from "@/components/marketing/reveal";
 import { FeatureCard } from "@/components/motion/feature-card";
 import { AnimatedCounter } from "@/components/motion/animated-counter";
@@ -311,6 +312,8 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      <CornerMascot />
     </main>
   );
 }
